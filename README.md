@@ -15,6 +15,7 @@ python3 -m pytest -s --html=reporter.html
 "python3 -m pytest -s tests/test_api.py --html=reporter.html"
 
 
+Reporter via pytest-html
 
 Finnhub documentation
 https://finnhub.io/docs/api/quote
