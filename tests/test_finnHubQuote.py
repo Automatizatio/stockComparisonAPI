@@ -2,6 +2,7 @@ import pytest
 import requests
 import pprint
 import os
+import time
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -27,44 +28,46 @@ def quoteRequest(stockTickerInput):
     quoteRequestBuilder += "quote?symbol=" + stockTickerInput +"&token="
     quoteRequestBuilder += finnHub_API_key
     response = requests.get(quoteRequestBuilder)
+    time.sleep(30) # to account for API usage limits
     return response
-    
+
+
 # A test that checks if the response status code is 200
 def test_statusCode(stockTicker):
-    print('hello')
-    print(stockTicker)
     response = quoteRequest(stockTicker)
-    pprint.pprint(response.json())    
     assert response.status_code == 200
 
-'''
+
 # A test that checks if the response status code is 200
-def test_contentKey():
-    response = quoteRequest()
+def test_contentKey(stockTicker):
+    response = quoteRequest(stockTicker)
     responseJson = response.json() 
     expectedKeys = ("c", "d", "dp", "h", "l", "o", "pc", "t")
-    #print(expectedKeys)
-    #print(responseJson['c'])
-    #print(responseJson.items())
-    #print(responseJson.keys())
     keys_list = list(responseJson.keys())
-    #print(keys_list)
     for expectedKey in expectedKeys:
-        #print(expectedKey)
-        #print(expectedKey in keys_list)
         assert(expectedKey in keys_list)
+
 
 # A test that ensures all quote response key-values are integers
 # And checks that low is lower than high
 # And checks that the dp percentage is correct.
-def test_contentValues():
-    response = quoteRequest()
-    print("\n")
-    pprint.pprint(response.json())
-    #assert(False)
+def test_contentValues(stockTicker):
+    response = quoteRequest(stockTicker)
+    responseJson = response.json() 
+    keys_list = list(responseJson.keys())
+    for key in keys_list:
+        assert(isinstance (responseJson[key], int) or isinstance (responseJson[key], float))
+    if (responseJson['h'] < responseJson['l']):
+        assert(False)
+    multiplier = 1 + (responseJson['dp'] / 100)
+    expectedClose = multiplier * responseJson['pc']
+    expectedClose = round(expectedClose, 2)
+    closePrice = responseJson['c']
+    if (expectedClose != closePrice):
+        assert(False)
 
-
-# A test that checks if the response is a valid JSON
+'''
+# this is kept to remember seeing JSON structure and pprint
 def test_json():
     response = get_joke()
     print("response.json()")
@@ -83,13 +86,4 @@ def test_json():
     print("API_KEY")
     print(API_KEY)
     assert response.headers["Content-Type"] == "application/json; charset=utf-8"
-
-# A test that checks if the response has the expected keys
-def test_keys():
-    response = get_joke()
-    data = response.json()
-    assert "id" in data
-    assert "type" in data
-    assert "setup" in data
-    assert "punchline" in data
 '''
