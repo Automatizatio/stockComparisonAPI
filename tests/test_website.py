@@ -1,7 +1,14 @@
 import pytest
 import time
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+
+from dotenv import load_dotenv
+load_dotenv()
+
+finnHub_username = os.getenv("finnHub_username")
+finnHub_password = os.getenv("finnHub_password")
 
 # A random website that shows a joke
 WEB_URL = "https://finnhub.io/"
@@ -12,7 +19,7 @@ def driver():
     driver = webdriver.Chrome()
     yield driver
     driver.quit()
-
+'''
 # A test that checks if the website title is correct
 def test_APIKeyGen(driver):
     driver.get(WEB_URL)
@@ -35,8 +42,21 @@ def test_APIKeyGen(driver):
     passwordInput = signupInputs[2].get_attribute("placeholder")
     print(passwordInput)
     assert passwordInput == "Password"
+'''
+# A test that checks if the website title is correct
+def test_APISignIn(driver):
+    driver.get(WEB_URL)
+    getAPIKeyBtn = driver.find_element(By.XPATH, ".//a[contains(text(), 'Login') ]")
+    assert getAPIKeyBtn.text == "Login"
+    getAPIKeyBtn.click()
+    emailLogin = driver.find_element(By.XPATH, ".//input[@placeholder = 'Email']").send_keys(finnHub_username)
+    emailPassword = driver.find_element(By.XPATH, ".//input[@placeholder = 'Password']").send_keys(finnHub_password)
+    # submit btn had the weirdest selector because there are two a elements with text "Login"
+    submitLoginBtn = driver.find_element(By.XPATH, ".//a[contains(text(), 'Login') and contains(@class, 'btn')]")
+    submitLoginBtn.click()
+    time.sleep(10)
 
-    #assert driver.title == "Jokes One - Jokes, Funny Videos, Funny Pictures"
+
 '''
 # A test that checks if the website has a joke section
 def test_joke_section(driver):
