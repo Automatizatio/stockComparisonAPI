@@ -9,6 +9,8 @@ load_dotenv()
 
 finnHub_username = os.getenv("finnHub_username")
 finnHub_password = os.getenv("finnHub_password")
+finnHub_apiKey = os.getenv("finnHub_API_key")
+
 
 # A random website that shows a joke
 WEB_URL = "https://finnhub.io/"
@@ -19,31 +21,31 @@ def driver():
     driver = webdriver.Chrome()
     yield driver
     driver.quit()
-'''
-# A test that checks if the website title is correct
+
+# A test that checks if finnhub sign up sheet has necessary input elements
 def test_APIKeyGen(driver):
     driver.get(WEB_URL)
     getAPIKeyBtn = driver.find_element(By.XPATH, ".//a[contains(text(), 'Get free API key') ]")    
     assert getAPIKeyBtn.text == "Get free API key"
     getAPIKeyBtn.click()
     signUpH2Element = driver.find_element(By.XPATH, ".//h2")
-    print(signUpH2Element.text)
+    #print(signUpH2Element.text)
     assert signUpH2Element.text == "Welcome to Finnhub.io"
     signupInputs = driver.find_elements(By.TAG_NAME, "input")    
-    print(len(signupInputs))
+    #print(len(signupInputs))
     assert len(signupInputs) == 3
-    print(signupInputs[0])
+    #print(signupInputs[0])
     nameInput = signupInputs[0].get_attribute("placeholder")
-    print(nameInput)
+    #print(nameInput)
     assert nameInput == "Name"
     emailInput = signupInputs[1].get_attribute("placeholder")
-    print(emailInput)
+    #print(emailInput)
     assert emailInput == "Email"
     passwordInput = signupInputs[2].get_attribute("placeholder")
-    print(passwordInput)
+    #print(passwordInput)
     assert passwordInput == "Password"
-'''
-# A test that checks if the website title is correct
+
+# A test that checks if user can login and view API token
 def test_APISignIn(driver):
     driver.get(WEB_URL)
     getAPIKeyBtn = driver.find_element(By.XPATH, ".//a[contains(text(), 'Login') ]")
@@ -54,8 +56,22 @@ def test_APISignIn(driver):
     # submit btn had the weirdest selector because there are two a elements with text "Login"
     submitLoginBtn = driver.find_element(By.XPATH, ".//a[contains(text(), 'Login') and contains(@class, 'btn')]")
     submitLoginBtn.click()
-    time.sleep(10)
+    time.sleep(2)
+    dashboardInputs = driver.find_elements(By.TAG_NAME, "input")
 
+    assert dashboardInputs[0].get_attribute("value") == finnHub_apiKey
+    '''
+    
+
+    try:
+        submitLoginBtn = driver.find_element(By.XPATH, ".//input[@value = 'chv58fhr01qrqeng2gugchv58fhr01qrqeng2gv0']")
+  # do something with element
+    except:
+        print("bad locator")
+        assert False, "bad locator for input that holds api key"
+    '''
+  # do something else or print error message
+    #print(submitLoginBtn)
 
 '''
 # A test that checks if the website has a joke section
